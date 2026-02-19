@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>For You 💖</title>
+<style>
+body {margin:0; font-family:Arial,sans-serif; background:#203a43; color:white; overflow:hidden;}
+canvas {position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; background:transparent;}
+.page {position:absolute; top:0; left:0; width:100vw; height:100vh; text-align:center; padding:20px 15px; opacity:0; transition:opacity 1.2s ease; pointer-events:none; box-sizing:border-box; background-color:#203a43;}
+.activePage {opacity:1; pointer-events:auto;}
+h1 {font-size:1.6em;}
+#typing {color:white; font-size:1.3em; line-height:1.5;}
+button {padding:14px 24px; font-size:16px; border:none; border-radius:25px; background:hotpink; color:white; cursor:pointer; margin-top:25px;}
+audio {width:100%; margin-top:15px;}
+.lyrics {margin-top:20px; font-size:16px; line-height:2em; max-height:45vh; overflow-y:auto;}
+.line {opacity:0.4; transition:0.3s;}
+.active {color:#ffd700; font-size:18px; opacity:1;}
+.heart {position:fixed; bottom:-10px; color:pink; animation:floatUp 6s linear infinite;}
+@keyframes floatUp {from{transform:translateY(0); opacity:1;} to{transform:translateY(-110vh); opacity:0;}}
+.firework {position:fixed; width:6px; height:6px; border-radius:50%; background:gold; animation:explode 1s ease-out forwards;}
+@keyframes explode {from{transform:scale(1); opacity:1;} to{transform:scale(18); opacity:0;}}
+#dustText {position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:48px; font-weight:bold; color:white; opacity:0; z-index:2;}
+@media (max-width:360px){h1{font-size:1.3em;} .lyrics{font-size:14px; line-height:1.8em;} .active{font-size:16px;} #dustText{font-size:32px;}}
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<div id="page1" class="page activePage">
+  <h1 id="typing"></h1>
+  <button onclick="startMusic()">Listen to music 🎶</button>
+</div>
+
+<div id="page2" class="page">
+  <h1>🎤 Ikaw Lang</h1>
+  <audio id="audio" controls>
+    <source src="ikawlang.mp3" type="audio/mpeg">
+  </audio>
+  <div class="lyrics" id="lyrics"></div>
+</div>
+
+<div id="page3" class="page">
+  <canvas id="dustCanvas"></canvas>
+  <div id="dustText">It's always you Daba 💖</div>
+</div>
+
+<script>
+// ⭐ Stars background
+const canvas = document.getElementById("stars");
+const ctx = canvas.getContext("2d");
+let w,h;
+function resize(){w=canvas.width=window.innerWidth; h=canvas.height=window.innerHeight;}
+window.onresize=resize;
+resize();
+const stars=Array.from({length:150},()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.5}));
+function drawStars(){ctx.clearRect(0,0,w,h); ctx.fillStyle="white"; stars.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();});}
+setInterval(drawStars,100);
+
+// ❤️ Hearts
+function createHeart(){const heart=document.createElement("div"); heart.className="heart"; heart.innerHTML="💖"; heart.style.left=Math.random()*100+"vw"; heart.style.fontSize=(Math.random()*20+15)+"px"; document.body.appendChild(heart); setTimeout(()=>heart.remove(),6000);}
+setInterval(createHeart,600);
+
+// 🎆 Fireworks
+function createFirework(){const fw=document.createElement("div"); fw.className="firework"; fw.style.left=Math.random()*100+"vw"; fw.style.top=Math.random()*100+"vh"; document.body.appendChild(fw); setTimeout(()=>fw.remove(),1000);}
+
+// ✍️ Typing effect
+const text="Hi Daba 💖\nSorry po 🥹...\nDili ako naga kanta hehe...\nbut I can make something that sings 🎵\n Basta panalingahi haha (❁´◡`❁) \nThis song is for you.\n Tagadi hantud mahuman hah haha ^_~";
+let i=0;
+const typingDiv=document.getElementById("typing");
+function typeText(){if(i<text.length){typingDiv.innerHTML+=text.charAt(i)==="\n"? "<br>":text.charAt(i);i++;setTimeout(typeText,60);}}
+typeText();
+
+// 🎵 Page switch
+function startMusic(){
+  document.getElementById("page1").classList.remove("activePage");
+  document.getElementById("page2").classList.add("activePage");
+  const audio = document.getElementById("audio");
+  audio.play().catch(()=>console.log("Click play manually if autoplay blocked"));
+}
+
+// 🎤 Karaoke lyrics placeholder
+const lyrics=[
+  // Bahala ka dito sa lyrics/timing
+  // {time:0,text:"First line"},
+  // {time:65,text:"Line after 1 min"},
+  // {time:130,text:"Line after 2 min",chorus:true},
+  {time:7,text:"Oh, kay gandang pagmasdan"},
+  {time:12,text:"Ang iyong mga mata"},
+  {time:16,text:"Kumikinang-kinang"},
+  {time:20,text:"'Di ko maintindihan"},
+  {time:24,text:"Ang iyong mga tingin"},
+  {time:28,text:"Labis ang mga ningning"},
+  {time:32,text:"Langit ay bumaba,"},
+  {time:36,text:"bumababa pala ang tala"}, 
+
+  {time:43,text:"Tumingin kasa 'king mga mata",chorus:true},
+  {time:47,text:"At hindi mo na kailangan pang",chorus:true},
+  {time:51,text:"'Magtanong nang paulit-ulit,",chorus:true},
+  {time:55,text:"ikaw lang ang iniibig",chorus:true},
+  {time:59,text:"At kung 'di kumbinsido'y magtiwala ka",chorus:true},
+  {time:63,text:"Hawakan ang puso't maniwala na",chorus:true},
+  {time:67,text:"Ikaw lang ang siyang inibig",chorus:true},
+  {time:70,text:"Ikaw lang ang iibigin",chorus:true},
+
+  {time:75,text:"At sa iyong paglalambing,"},
+  {time:78,text:"ako ay nahulog din"},
+  {time:82,text:"'Di ko alam kung ano ang gagawin"},
+  {time:86,text:"'Di ko alam kung saan titingin"},
+  {time:91,text:"Halik sa labi, tinginan natin"},
+  {time:98,text:"'Di akalaing mahuhulog ka sa 'kin"},
+
+  {time:107,text:"Tumingin kasa 'king mga mata",chorus:true},
+  {time:110,text:"At hindi mo na kailangan pang",chorus:true},
+  {time:115,text:"'Magtanong nang paulit-ulit,",chorus:true},
+  {time:118,text:"ikaw lang ang iniibig",chorus:true},
+  {time:122,text:"At kung 'di kumbinsido'y magtiwala ka",chorus:true},
+  {time:127,text:"Hawakan ang puso't maniwala na",chorus:true},
+  {time:130,text:"Ikaw lang ang siyang inibig",chorus:true},
+  {time:134,text:"Ikaw lang ang iibigin",chorus:true},
+  {time:138,text:"Sinta.....",chorus:true},
+  
+  {time:154,text:"At sa paglisan ng araw, akala’y ’di ka mahal"},
+  {time:162,text:"At ang nadarama'y hindi magtatagal"},
+  {time:170,text:"Malay ko bang hindi mapapagal"},
+  {time:177,text:"Iibigin kita kahit ga’no pa katagal"},
+  
+  {time:188,text:"Tumingin kasa 'king mga mata",chorus:true},
+  {time:192,text:"At hindi mo na kailangan pang",chorus:true},
+  {time:197,text:"'Magtanong nang paulit-ulit,",chorus:true},
+  {time:200,text:"ikaw lang ang iniibig",chorus:true},
+  {time:205,text:"At kung 'di kumbinsido'y magtiwala ka",chorus:true},
+  {time:208,text:"Hawakan ang puso't maniwala na",chorus:true},
+  {time:212,text:"Ikaw lang ang siyang inibig",chorus:true},
+  {time:216,text:"Ikaw lang ang iibigin",chorus:true},
+ 
+  {time:220,text:"La-la-la, la-la-la, la-la, la-la-la"},
+  {time:224,text:"La-la-la, la-la-la, la-la, la-la-la"},
+  {time:228,text:"La-la-la, la-la-la"},
+  {time:235,text:"La-la-la, la-la-la, la-la, la-la-la"},
+  {time:240,text:"La-la-la, la-la-la, la-la, la-la-la"},
+  {time:244,text:"La-la-la, la-la-la"},
+
+  {time:255,text:"Sinta ^_~"},
+  {time:258,text:"Sorry na po uwu 🥹😔"},
+];
+
+const lyricsDiv=document.getElementById("lyrics");
+lyrics.forEach((line,index)=>{
+  const p=document.createElement("p");
+  p.classList.add("line");
+  p.id="line"+index;
+  p.innerHTML=line.text;
+  lyricsDiv.appendChild(p);
+});
+
+const audio=document.getElementById("audio");
+audio.addEventListener("timeupdate",()=>{
+  const currentTime=audio.currentTime;
+
+  lyrics.forEach((line,index)=>{
+    const el=document.getElementById("line"+index);
+    if(currentTime>=line.time && (index===lyrics.length-1 || currentTime<lyrics[index+1].time)){
+      el.classList.add("active");
+
+      // ✅ Scroll active line sa baba ng center (~60% ng div height)
+      const container=lyricsDiv;
+      const containerHeight=container.clientHeight;
+      const elOffset=el.offsetTop;
+      const elHeight=el.offsetHeight;
+      container.scrollTop=elOffset - containerHeight*0.9 + elHeight/2;
+
+      if(line.chorus) createFirework();
+    }else{el.classList.remove("active");}
+  });
+
+  if(audio.currentTime>=audio.duration-1){
+    document.getElementById("page2").classList.remove("activePage");
+    document.getElementById("page3").classList.add("activePage");
+    showDustText();
+  }
+});
+
+// 💙 Ending dust text effect
+function showDustText(){
+  const dust=document.getElementById("dustText");
+  dust.style.opacity=1;
+  dust.style.transition="opacity 2s ease-in-out, transform 2s ease-in-out";
+  dust.style.transform="translate(-50%, -50%) scale(1.2)";
+}
+</script>
+
+</body>
+</html>
